@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "SharpRogue", "SharpRogue\SharpRogue.fsproj", "{C9B74B0B-9F4E-4082-A331-F52158BCBA12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9B74B0B-9F4E-4082-A331-F52158BCBA12}.Debug|x86.ActiveCfg = Debug|x86
+		{C9B74B0B-9F4E-4082-A331-F52158BCBA12}.Debug|x86.Build.0 = Debug|x86
+		{C9B74B0B-9F4E-4082-A331-F52158BCBA12}.Release|x86.ActiveCfg = Release|x86
+		{C9B74B0B-9F4E-4082-A331-F52158BCBA12}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = SharpRogue\SharpRogue.fsproj
+	EndGlobalSection
+EndGlobal
