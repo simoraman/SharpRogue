@@ -65,18 +65,29 @@ let drawWorld world =
     System.Console.Clear()
     List.map (fun x -> drawTile(x)) world |> ignore
 
+let findTile coord elem = (fst elem) = coord
+
 let rec gameLoop(coordinate) =
+    let tryNew newCoordinates = 
+        let found = List.find (findTile (newCoordinates.x, newCoordinates.y)) generateCoordinates  
+        if (snd found) = '#' then coordinate else newCoordinates     
+    let move direction = 
+        match direction with
+            | Right -> tryNew { x = coordinate.x + 1; y = coordinate.y; } |> gameLoop
+            | Down -> tryNew { x = coordinate.x; y = coordinate.y + 1; } |> gameLoop
+            | Left -> tryNew { x = coordinate.x - 1; y = coordinate.y; } |> gameLoop
+            | Up -> tryNew { x = coordinate.x; y = coordinate.y - 1; } |> gameLoop
+            | _ -> ()
+
     generateCoordinates |> drawWorld
     drawHero coordinate
     let input = getInput()
     match input with
-        | Right -> gameLoop { x = coordinate.x + 1; y = coordinate.y; }
-        | Down -> gameLoop { x = coordinate.x; y = coordinate.y + 1; }
-        | Left -> gameLoop { x = coordinate.x - 1; y = coordinate.y; }
-        | Up -> gameLoop { x = coordinate.x; y = coordinate.y - 1; }
         | Exit -> ()
+        | _ -> move input    
+
 
 [<EntryPoint>]
 let main argv = 
-    gameLoop {x = 0; y = 0;}
+    gameLoop {x = 1; y = 1;}
     0 // return an integer exit code
