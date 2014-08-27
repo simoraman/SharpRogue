@@ -70,14 +70,18 @@ let findTile coord elem = (fst elem) = coord
 let rec gameLoop(coordinate) =
     let tryNew newCoordinates = 
         let found = List.find (findTile (newCoordinates.x, newCoordinates.y)) generateCoordinates  
-        if (snd found) = '#' then coordinate else newCoordinates     
+        match (snd found) with
+        | '#' -> coordinate
+        | '+' -> coordinate         
+        | _ -> newCoordinates     
     let move direction = 
         match direction with
-            | Right -> tryNew { x = coordinate.x + 1; y = coordinate.y; } |> gameLoop
-            | Down -> tryNew { x = coordinate.x; y = coordinate.y + 1; } |> gameLoop
-            | Left -> tryNew { x = coordinate.x - 1; y = coordinate.y; } |> gameLoop
-            | Up -> tryNew { x = coordinate.x; y = coordinate.y - 1; } |> gameLoop
-            | _ -> ()
+            | Right -> tryNew { x = coordinate.x + 1; y = coordinate.y; }
+            | Down -> tryNew { x = coordinate.x; y = coordinate.y + 1; }
+            | Left -> tryNew { x = coordinate.x - 1; y = coordinate.y; }
+            | Up -> tryNew { x = coordinate.x; y = coordinate.y - 1; } 
+            | _ -> coordinate
+        |> gameLoop
 
     generateCoordinates |> drawWorld
     drawHero coordinate
