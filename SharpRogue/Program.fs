@@ -4,6 +4,11 @@ open Microsoft.FSharp.Collections
 
 type Coordinate = { x:int; y:int; }
 
+type Hero = {
+    currentPosition : Coordinate;
+    oldPosition : Coordinate;
+}
+
 type Input = 
     Up 
     | Down
@@ -21,9 +26,17 @@ let rec getInput() =
         | System.ConsoleKey.Q -> Exit
         | _ -> getInput()
 
-let drawHero (coordinate:Coordinate) = 
-    System.Console.SetCursorPosition(coordinate.x, coordinate.y)
+let findTile coord elem = (fst elem) = coord
+
+let drawHero (hero:Hero, world:((int * int) * char) list) = 
+    System.Console.SetCursorPosition(hero.currentPosition.x, hero.currentPosition.y)
     System.Console.Write '@'
+
+    let found = List.find (findTile (hero.oldPosition.x, hero.oldPosition.y)) world
+    System.Console.SetCursorPosition(hero.oldPosition.x, hero.oldPosition.y)
+    snd found |> System.Console.Write
+    System.Console.SetCursorPosition(0,0)
+        
 
 let map1 = [ 
         "##############";
@@ -65,26 +78,27 @@ let drawWorld world =
     System.Console.Clear()
     List.map (fun x -> drawTile(x)) world |> ignore
 
-let findTile coord elem = (fst elem) = coord
 
-let rec gameLoop(coordinate) =
+
+let rec gameLoop(hero) =
+
     let tryNew newCoordinates = 
         let found = List.find (findTile (newCoordinates.x, newCoordinates.y)) generateCoordinates  
         match (snd found) with
-        | '#' -> coordinate
-        | '+' -> coordinate         
-        | _ -> newCoordinates     
+        | '#' -> hero
+        | '+' -> hero         
+        | _ -> {hero with currentPosition = newCoordinates; oldPosition = hero.currentPosition}     
+
     let move direction = 
         match direction with
-            | Right -> tryNew { x = coordinate.x + 1; y = coordinate.y; }
-            | Down -> tryNew { x = coordinate.x; y = coordinate.y + 1; }
-            | Left -> tryNew { x = coordinate.x - 1; y = coordinate.y; }
-            | Up -> tryNew { x = coordinate.x; y = coordinate.y - 1; } 
-            | _ -> coordinate
+            | Right -> tryNew { x = hero.currentPosition.x + 1; y = hero.currentPosition.y; }
+            | Down -> tryNew { x = hero.currentPosition.x; y = hero.currentPosition.y + 1; }
+            | Left -> tryNew { x = hero.currentPosition.x - 1; y = hero.currentPosition.y; }
+            | Up -> tryNew { x = hero.currentPosition.x; y = hero.currentPosition.y - 1; } 
+            | _ -> hero
         |> gameLoop
 
-    generateCoordinates |> drawWorld
-    drawHero coordinate
+    drawHero (hero, generateCoordinates)
     let input = getInput()
     match input with
         | Exit -> ()
@@ -93,5 +107,6 @@ let rec gameLoop(coordinate) =
 
 [<EntryPoint>]
 let main argv = 
-    gameLoop {x = 1; y = 1;}
+    generateCoordinates |> drawWorld
+    gameLoop { oldPosition = {x = 1; y = 1;}; currentPosition = {x = 1; y = 1;}; }
     0 // return an integer exit code
