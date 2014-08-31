@@ -1,6 +1,4 @@
-﻿// Learn more about F# at http://fsharp.net
-// See the 'F# Tutorial' project for more help.
-namespace SharpRogue
+﻿namespace SharpRogue
 module main =
     open Microsoft.FSharp.Collections
     open Types
@@ -15,15 +13,15 @@ module main =
             | System.ConsoleKey.Q -> Exit
             | _ -> getInput()
 
-    let findTile coord elem = (fst elem) = coord
+    let findTile coord elem = elem.coordinate = coord
 
-    let drawHero (hero:Hero, world:((int * int) * char) list) = 
+    let drawHero (hero:Hero, world:MapTile list) = 
         System.Console.SetCursorPosition(hero.currentPosition.x, hero.currentPosition.y)
         System.Console.Write '@'
 
-        let found = List.find (findTile (hero.oldPosition.x, hero.oldPosition.y)) world
+        let found = List.find (findTile hero.oldPosition) world
         System.Console.SetCursorPosition(hero.oldPosition.x, hero.oldPosition.y)
-        snd found |> System.Console.Write
+        found.tile |> System.Console.Write
         System.Console.SetCursorPosition(0,0)
             
 
@@ -36,32 +34,24 @@ module main =
             "#     ~~     #          #    #";
             "#      ~~    #          # <  #";
             "##############          ######" ]
-    let s = seq { 
-                for row in 0 .. 100 do 
-                    for col in 0 .. 100 do 
-                        let y = [(row, col)] |> Seq.ofList
-                        yield y
-                }
-    let realMap = [for str in map1 -> [for c in str -> c]]
+    
+    let tokenizeMap map = [for str in map -> [for c in str -> c]]
 
     //mutable crap
     let generateCoordinates =
         let mutable y' = 0
         let mutable coord = List.empty
-        for row in realMap do
+        for row in tokenizeMap map1 do
             let mutable x' = 0
             for col in row do
-                coord <- List.append coord [((x',y'),col)]
+                coord <- List.append coord [{ coordinate = { x = x'; y = y'; }; tile = col; }]
                 x' <- x' + 1
             y' <- y' + 1
         coord
 
-    let drawTile (tile:(int * int) * char) = 
-                let x = tile |> fst |> fst
-                let y = tile |> fst |> snd
-                let ch = tile |> snd
-                System.Console.SetCursorPosition(x,y)
-                System.Console.Write ch
+    let drawTile (tile:MapTile) = 
+                System.Console.SetCursorPosition(tile.coordinate.x, tile.coordinate.y)
+                System.Console.Write tile.tile
             
     let drawWorld world = 
         System.Console.Clear()
@@ -72,8 +62,8 @@ module main =
     let rec gameLoop(hero) =
 
         let tryNew newCoordinates = 
-            let found = List.find (findTile (newCoordinates.x, newCoordinates.y)) generateCoordinates  
-            match (snd found) with
+            let found = List.find (findTile newCoordinates) generateCoordinates  
+            match found.tile with
             | '#' -> hero
             | '+' -> hero         
             | _ -> {hero with currentPosition = newCoordinates; oldPosition = hero.currentPosition}     

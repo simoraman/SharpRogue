@@ -7,6 +7,11 @@ module Types =
         oldPosition : Coordinate;
     }
 
+    type MapTile = {
+        coordinate : Coordinate;
+        tile : char;
+    }
+
     type Input = 
         Up 
         | Down
