@@ -11,9 +11,9 @@ module main =
             | System.ConsoleKey.DownArrow -> Down
             | System.ConsoleKey.LeftArrow -> Left
             | System.ConsoleKey.UpArrow -> Up
+            | System.ConsoleKey.O -> Open
             | System.ConsoleKey.Q -> Exit
             | _ -> getInput()
-
 
     let map1 = [ 
             "##############";
@@ -37,9 +37,10 @@ module main =
             y' <- y' + 1
         coord
 
-    let move direction hero = 
+    let move direction world = 
+        let hero = world.hero
         let tryNew newCoordinates = 
-            let found = List.find (Utils.findTile newCoordinates) generateCoordinates  
+            let found = List.find (Utils.findTile newCoordinates) world.tiles  
             match found.tile with
             | '#' -> hero
             | '+' -> hero         
@@ -51,16 +52,32 @@ module main =
             | Up -> tryNew { x = hero.currentPosition.x; y = hero.currentPosition.y - 1; } 
             | _ -> hero
 
-    let rec gameLoop(hero) =
-        drawHero (hero, generateCoordinates)
+    let openDoor hero world = 
+        let direction = getInput()
+        let coordinate = 
+            match direction with
+            | Right -> { x = hero.currentPosition.x + 1; y = hero.currentPosition.y; }
+            | Down -> { x = hero.currentPosition.x; y = hero.currentPosition.y + 1; }
+            | Left -> { x = hero.currentPosition.x - 1; y = hero.currentPosition.y; }
+            | Up -> { x = hero.currentPosition.x; y = hero.currentPosition.y - 1; } 
+            | _ -> hero.currentPosition
+        let tile = List.find (Utils.findTile coordinate) world.tiles
+        if tile.tile = '+' then drawOpenDoor tile.coordinate
+        let newTiles = List.map (fun x -> if x.coordinate = coordinate then { x with tile = '-'} else x) world.tiles
+
+        {world with hero = hero; tiles = newTiles}
+
+    let rec gameLoop world =
+        drawHero (world.hero, world.tiles)
         let input = getInput()
         match input with
             | Exit -> ()
-            | _ -> move input hero |> gameLoop  
-
+            | Open -> openDoor world.hero world |> gameLoop
+            | _ -> {world with hero = (move input world);} |> gameLoop  
 
     [<EntryPoint>]
     let main argv = 
         generateCoordinates |> drawWorld
-        gameLoop { oldPosition = {x = 1; y = 1;}; currentPosition = {x = 1; y = 1;}; }
+        let world = {hero = { oldPosition = {x = 1; y = 1;}; currentPosition = {x = 1; y = 1;}; }; tiles = generateCoordinates}
+        gameLoop world
         0 // return an integer exit code

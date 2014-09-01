@@ -12,9 +12,15 @@ module Types =
         tile : char;
     }
 
+    type World = {
+        tiles : MapTile list
+        hero : Hero
+    }
+
     type Input = 
         Up 
         | Down
         | Left
         | Right
+        | Open
         | Exit
