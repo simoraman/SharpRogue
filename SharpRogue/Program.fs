@@ -37,30 +37,26 @@ module main =
             y' <- y' + 1
         coord
 
-    let move direction world = 
-        let hero = world.hero
-        let tryNew newCoordinates = 
-            let found = List.find (Utils.findTile newCoordinates) world.tiles  
-            match found.tile with
-            | '#' -> hero
-            | '+' -> hero         
-            | _ -> {hero with currentPosition = newCoordinates; oldPosition = hero.currentPosition} 
+    let getNextCoordinate hero direction = 
         match direction with
-            | Right -> tryNew { x = hero.currentPosition.x + 1; y = hero.currentPosition.y; }
-            | Down -> tryNew { x = hero.currentPosition.x; y = hero.currentPosition.y + 1; }
-            | Left -> tryNew { x = hero.currentPosition.x - 1; y = hero.currentPosition.y; }
-            | Up -> tryNew { x = hero.currentPosition.x; y = hero.currentPosition.y - 1; } 
-            | _ -> hero
-
-    let openDoor hero world = 
-        let direction = getInput()
-        let coordinate = 
-            match direction with
             | Right -> { x = hero.currentPosition.x + 1; y = hero.currentPosition.y; }
             | Down -> { x = hero.currentPosition.x; y = hero.currentPosition.y + 1; }
             | Left -> { x = hero.currentPosition.x - 1; y = hero.currentPosition.y; }
             | Up -> { x = hero.currentPosition.x; y = hero.currentPosition.y - 1; } 
             | _ -> hero.currentPosition
+
+    let move direction world = 
+        let hero = world.hero
+        let newCoordinates = getNextCoordinate hero direction
+        let found = List.find (Utils.findTile newCoordinates) world.tiles   
+        match found.tile with
+            | '#' -> hero
+            | '+' -> hero         
+            | _ -> {hero with currentPosition = newCoordinates; oldPosition = hero.currentPosition} 
+
+    let openDoor hero world = 
+        let direction = getInput()
+        let coordinate = getNextCoordinate hero direction
         let tile = List.find (Utils.findTile coordinate) world.tiles
         if tile.tile = '+' then drawOpenDoor tile.coordinate
         let newTiles = List.map (fun x -> if x.coordinate = coordinate then { x with tile = '-'} else x) world.tiles
