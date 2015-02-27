@@ -3,9 +3,10 @@ module Graphics =
     open Types
 
     let hideCursor() = System.Console.SetCursorPosition(0,0)
+
     let drawHero (hero:Hero, world:MapTile list) = 
         System.Console.SetCursorPosition(hero.currentPosition.x, hero.currentPosition.y)
-        System.Console.Write '@'
+        System.Console.Write hero.avatar
 
         let found = List.find (Utils.findTile hero.oldPosition) world
         System.Console.SetCursorPosition(hero.oldPosition.x, hero.oldPosition.y)

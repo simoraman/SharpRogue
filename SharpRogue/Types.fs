@@ -2,10 +2,13 @@
 module Types =
     type Coordinate = { x:int; y:int; }
 
-    type Hero = {
+    type Creature = {
         currentPosition : Coordinate;
         oldPosition : Coordinate;
+        avatar : char
     }
+
+    type Hero = Creature
 
     type MapTile = {
         coordinate : Coordinate;
@@ -15,6 +18,7 @@ module Types =
     type World = {
         tiles : MapTile list
         hero : Hero
+        monster : Creature
     }
 
     type Input = 

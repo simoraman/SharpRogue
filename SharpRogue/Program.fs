@@ -48,11 +48,15 @@ module main =
     let move direction world = 
         let hero = world.hero
         let newCoordinates = getNextCoordinate hero direction
-        let found = List.find (Utils.findTile newCoordinates) world.tiles   
-        match found.tile with
-            | '#' -> hero
-            | '+' -> hero         
-            | _ -> {hero with currentPosition = newCoordinates; oldPosition = hero.currentPosition} 
+        if newCoordinates = world.monster.currentPosition 
+            then hero
+            else
+                let found = List.find (Utils.findTile newCoordinates) world.tiles   
+                match found.tile with
+                    | '#' -> hero
+                    | '+' -> hero
+                    | 'e' -> hero
+                    | _ -> {hero with currentPosition = newCoordinates; oldPosition = hero.currentPosition} 
 
     let openDoor hero world = 
         let direction = getInput()
@@ -63,17 +67,34 @@ module main =
 
         {world with hero = hero; tiles = newTiles}
 
+    let moveMonster world =
+        let monster = world.monster
+        let hero = world.hero
+        let deltaX = hero.currentPosition.x - monster.currentPosition.x
+        let deltaY = hero.currentPosition.y - monster.currentPosition.y
+        let direction = 
+            if abs(deltaX) > abs(deltaY) then 
+                if deltaX < 0 then Left else Right
+            else 
+                if deltaY < 0 then Up else Down
+        let newPosition = getNextCoordinate monster direction
+        {monster with oldPosition = monster.currentPosition; currentPosition = newPosition}
+
     let rec gameLoop world =
         drawHero (world.hero, world.tiles)
+        drawHero (world.monster, world.tiles)
         let input = getInput()
+        let monster = moveMonster world
         match input with
             | Exit -> ()
             | Open -> openDoor world.hero world |> gameLoop
-            | _ -> {world with hero = (move input world);} |> gameLoop  
+            | _ -> {world with hero = (move input world); monster = monster} |> gameLoop  
 
     [<EntryPoint>]
     let main argv = 
         generateCoordinates |> drawWorld
-        let world = {hero = { oldPosition = {x = 1; y = 1;}; currentPosition = {x = 1; y = 1;}; }; tiles = generateCoordinates}
+        let hero = { avatar = '@'; oldPosition = {x = 0; y = 0;}; currentPosition = {x = 1; y = 1;}; }
+        let monster = { avatar = 'e'; oldPosition = {x = 0; y = 0;}; currentPosition = {x = 10; y = 3;}; }
+        let world = {hero = hero; tiles = generateCoordinates; monster = monster}
         gameLoop world
         0 // return an integer exit code
