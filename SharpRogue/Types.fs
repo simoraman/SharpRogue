@@ -5,7 +5,8 @@ module Types =
     type Creature = {
         currentPosition : Coordinate;
         oldPosition : Coordinate;
-        avatar : char
+        avatar : char;
+        health: int
     }
 
     type Hero = Creature

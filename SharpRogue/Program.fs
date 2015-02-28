@@ -78,6 +78,7 @@ module main =
             else 
                 if deltaY < 0 then Up else Down
         let newPosition = getNextCoordinate monster direction
+        if hero.currentPosition = newPosition then monster else
         {monster with oldPosition = monster.currentPosition; currentPosition = newPosition}
 
     let rec gameLoop world =
@@ -88,13 +89,13 @@ module main =
         match input with
             | Exit -> ()
             | Open -> openDoor world.hero world |> gameLoop
-            | _ -> {world with hero = (move input world); monster = monster} |> gameLoop  
+            | _ -> {world with hero = (move input {world with monster = monster}); monster = monster} |> gameLoop  
 
     [<EntryPoint>]
     let main argv = 
         generateCoordinates |> drawWorld
-        let hero = { avatar = '@'; oldPosition = {x = 0; y = 0;}; currentPosition = {x = 1; y = 1;}; }
-        let monster = { avatar = 'e'; oldPosition = {x = 0; y = 0;}; currentPosition = {x = 10; y = 3;}; }
+        let hero = { avatar = '@'; oldPosition = {x = 0; y = 0;}; currentPosition = {x = 1; y = 1;}; health = 10; }
+        let monster = { avatar = 'e'; oldPosition = {x = 0; y = 0;}; currentPosition = {x = 10; y = 3;}; health = 5; }
         let world = {hero = hero; tiles = generateCoordinates; monster = monster}
         gameLoop world
         0 // return an integer exit code
