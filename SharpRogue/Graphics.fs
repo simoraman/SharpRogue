@@ -4,12 +4,14 @@ module Graphics =
 
     let hideCursor() = System.Console.SetCursorPosition(0,0)
 
-    let drawHero (hero:Hero, world:MapTile list) = 
-        System.Console.SetCursorPosition(hero.currentPosition.x, hero.currentPosition.y)
-        System.Console.Write hero.avatar
+    let inline drawCreature (creature:Coordinate*Coordinate*char, world:MapTile list) = 
+        let (newPosition, oldPosition, avatar) = creature
+        System.Console.SetCursorPosition(newPosition.x, newPosition.y)
+        
+        System.Console.Write avatar
 
-        let found = List.find (Utils.findTile hero.oldPosition) world
-        System.Console.SetCursorPosition(hero.oldPosition.x, hero.oldPosition.y)
+        let found = List.find (Utils.findTile oldPosition) world
+        System.Console.SetCursorPosition(oldPosition.x, oldPosition.y)
         found.tile |> System.Console.Write
         hideCursor()
 
