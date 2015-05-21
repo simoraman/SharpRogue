@@ -82,8 +82,8 @@ module main =
         {monster with oldPosition = monster.currentPosition; currentPosition = newPosition}
 
     let rec gameLoop world =
-        drawCreature ((world.hero.currentPosition, world.hero.oldPosition, world.hero.avatar), world.tiles)
-        drawCreature ((world.monster.currentPosition, world.monster.oldPosition, world.monster.avatar), world.tiles)
+        drawCreature (world.hero, world.tiles)
+        drawCreature (world.monster, world.tiles)
         let input = getInput()
         let monster = moveMonster world
         match input with

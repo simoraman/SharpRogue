@@ -2,12 +2,20 @@
 module Types =
     type Coordinate = { x:int; y:int; }
 
-    type Creature = {
-        currentPosition : Coordinate;
+    type ICreature =
+        abstract currentPosition: Coordinate
+        abstract oldPosition: Coordinate
+        abstract avatar: char
+
+    type Creature = 
+        {currentPosition : Coordinate;
         oldPosition : Coordinate;
         avatar : char;
-        health: int
-    }
+        health: int}
+        interface ICreature with
+            member x.currentPosition = x.currentPosition
+            member x.oldPosition = x.oldPosition
+            member x.avatar = x.avatar
 
     type Hero = Creature
 
